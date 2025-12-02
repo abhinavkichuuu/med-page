@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MediGuideAI</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --accent: #124a9e;
+      --accent-soft: #2f6ddf;
+      --muted: #6c7a90;
+      --radius: 18px;
+      --shadow: 0 10px 26px rgba(10, 40, 90, 0.12);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 22px 20px 26px;
+      box-shadow: var(--shadow);
+    }
+
+    /* HEADER – option B: logos left/right, text centered */
+    header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      margin-bottom: 20px;
+      column-gap: 10px;
+    }
+    .head-left {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 22px;
+    }
+    .head-center {
+      text-align: center;
+      line-height: 1.2;
+    }
+    .brand-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0;
+    }
+    .sub-brand-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 2px 0 0;
+    }
+    .head-right {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .logo-ncp {
+      height: 40px;
+      width: auto;
+      border-radius: 10px;
+      object-fit: contain;
+    }
+
+    main { margin-top: 8px; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px 16px 18px;
+      border: 1px solid rgba(12, 36, 90, 0.04);
+    }
+
+    .title-main {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 10px;
+      color: #1b2b40;
+      text-align: center;
+    }
+    .text-center { text-align: center; }
+    .text-muted {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .input-wrapper {
+      border-radius: 16px;
+      border: 1px solid rgba(18, 74, 158, 0.18);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f4f7ff;
+    }
+    .input-wrapper input {
+      border: none;
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-size: 16px;
+      color: #1d2b40;
+    }
+    .input-wrapper input::placeholder { color: #a0a9bd; }
+
+    .btn {
+      width: 100%;
+      margin-top: 16px;
+      border-radius: 16px;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(18, 74, 158, 0.25);
+    }
+    .btn-secondary {
+      background: #eef3ff;
+      color: var(--accent);
+      border: 1px solid rgba(18, 74, 158, 0.16);
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .pill-card {
+      margin-top: 4px;
+      border-radius: 18px;
+      padding: 18px 16px;
+      background: #f6f8ff;
+      border: 1px solid rgba(18, 74, 158, 0.06);
+    }
+    .pill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .pill-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .pill-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid rgba(18, 74, 158, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pill-section-title {
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      color: #21324b;
+    }
+    ul.counsel-list {
+      margin: 4px 0 0;
+      padding-left: 18px;
+      color: #3b4860;
+      font-size: 14px;
+    }
+    ul.counsel-list li { margin-bottom: 4px; }
+
+    .error-text {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #c62828;
+      min-height: 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 8px; }
+      .app {
+        border-radius: 20px;
+        padding: 18px 14px 22px;
+      }
+      .brand-text { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER (shows on all pages) -->
+    <header>
+      <div class="head-left">
+        <div class="brand-icon">+</div>
+      </div>
+      <div class="head-center">
+        <p class="brand-text">MediGuideAI</p>
+        <p class="sub-brand-text">Department of Pharmacy Practice</p>
+      </div>
+      <div class="head-right">
+        <!-- Make sure ncp-logo.png is in the same folder -->
+        <img src="ncp-logo.png" alt="NCP Logo" class="logo-ncp">
+      </div>
+    </header>
+
+    <main>
+      <!-- PAGE 1: Enter medicine name -->
+      <section id="screen1" class="screen active">
+        <div class="card">
+          <h2 class="title-main">Enter medicine name</h2>
+
+          <div class="input-wrapper">
+            <input id="medInput" type="text" placeholder="Enter medicine name" autocomplete="off">
+          </div>
+
+          <button id="submitBtn" class="btn btn-primary">Submit</button>
+
+          <div id="errorMsg" class="error-text"></div>
+          <div class="text-muted text-center">
+            Examples: Paracetamol, Ibuprofen, Cetirizine, Amoxicillin, ORS, Omeprazole…
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: Medicine received button only -->
+      <section id="screen2" class="screen">
+        <div class="card">
+          <h2 class="title-main">Confirm medicine</h2>
+          <p class="text-center text-muted">
+            Medicine: <strong id="confirmName"></strong>
+          </p>
+          <button id="receivedBtn" class="btn btn-primary">Medicine received</button>
+        </div>
+      </section>
+
+      <!-- PAGE 3: Counselling points -->
+      <section id="screen3" class="screen">
+        <div class="pill-card">
+          <div class="pill-header">
+            <div>
+              <div class="pill-name" id="cMedName">Paracetamol</div>
+              <div class="text-muted" id="cMedTagline">Counselling &amp; safety tips</div>
+            </div>
+            <div class="pill-icon">
+              <!-- simple pill icon -->
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="11" height="14" rx="3" fill="#2f6ddf" />
+                <rect x="11" y="5" width="11" height="14" rx="3" fill="#ffffff" stroke="#2f6ddf" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="pill-section-title">Counselling points</div>
+          <ul id="counselList" class="counsel-list"></ul>
+        </div>
+
+        <button id="okBtn" class="btn btn-primary" style="margin-top: 16px;">OK</button>
+      </section>
+
+      <!-- PAGE 4: Need another medicine or done -->
+      <section id="screen4" class="screen">
+        <div class="card">
+          <h2 class="title-main">Need another medicine?</h2>
+          <p class="text-center text-muted">
+            Do you want to check counselling for another medicine?
+          </p>
+          <button id="anotherBtn" class="btn btn-secondary">Yes, another medicine</button>
+          <button id="doneBtn" class="btn btn-primary">Done</button>
+        </div>
+      </section>
+
+      <!-- PAGE 5: Thank you page -->
+      <section id="screen5" class="screen">
+        <div class="card">
+          <h2 class="title-main">Thank you for using MediGuideAI! 💊</h2>
+          <p class="text-center text-muted">
+            Stay safe &amp; use medicines responsibly.<br>
+            You can go back to the start if you want to check another medicine.
+          </p>
+          <button id="backToStartBtn" class="btn btn-primary">Back to start</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ---------- 1. MEDICINE DATA: 5 UNIQUE POINTS EACH (WITH EMOJIS) ----------
+
+    const counsellingData = {
+      "paracetamol": [
+        "💊 Take 1 tablet after food.",
+        "🌡️ Used for fever and mild to moderate pain.",
+        "⏱️ Keep at least 4–6 hours between doses.",
+        "🚫 Do not use more than 3 doses in 24 hours.",
+        "🍺 Avoid alcohol while taking paracetamol."
+      ],
+      "ibuprofen": [
+        "💊 Take after food to protect the stomach.",
+        "🔥 Helps reduce pain, swelling and inflammation.",
+        "🚫 Avoid if you have stomach ulcers or severe kidney disease.",
+        "⏱️ Use the lowest effective dose for the shortest time.",
+        "😴 May cause dizziness in some people – get up slowly."
+      ],
+      "diclofenac": [
+        "💊 Take after food to reduce stomach irritation.",
+        "🔥 Strong painkiller used for joint and muscle pain.",
+        "🚫 Avoid if you have severe kidney, liver or stomach ulcer problems.",
+        "⏱️ Do not use for long periods without medical supervision.",
+        "🍺 Avoid alcohol to protect the stomach and liver."
+      ],
+      "aceclofenac": [
+        "💊 Take after food with water.",
+        "🔥 Used for joint pain and inflammation.",
+        "🚫 Avoid in severe kidney or liver disease.",
+        "⏱️ Do not use for long time without doctor review.",
+        "🤢 Inform doctor if you have severe stomach pain or black stool."
+      ],
+      "mefenamic acid": [
+        "💊 Often used for menstrual pain and cramps.",
+        "🍽️ Take after food to reduce stomach upset.",
+        "🚫 Avoid if you have history of ulcer or bleeding.",
+        "⏱️ Use only for short-term pain relief.",
+        "🍺 Avoid alcohol while taking this medicine."
+      ],
+      "aspirin": [
+        "💊 Low dose is used for heart protection in some patients.",
+        "🍽️ Take after food to reduce stomach irritation.",
+        "🚫 Not recommended in children with fever (risk of Reye’s syndrome).",
+        "🩸 May increase bleeding risk – inform doctor before surgery.",
+        "🍺 Avoid alcohol as it increases bleeding and stomach risk."
+      ],
+      "tramadol": [
+        "💊 Used for moderate to severe pain as prescribed.",
+        "😴 Can cause sleepiness and dizziness.",
+        "🚗 Avoid driving or operating machines after taking.",
+        "🚫 Do not combine with alcohol or other sedatives.",
+        "⚠️ Use only under strict medical supervision."
+      ],
+      "naproxen": [
+        "💊 Take after food to protect the stomach.",
+        "🔥 Used for joint pain, sprain and period pain.",
+        "🚫 Avoid if you have ulcer or kidney problems.",
+        "⏱️ Take only for the duration prescribed.",
+        "🍺 Avoid alcohol to reduce stomach side effects."
+      ],
+      "amoxicillin": [
+        "💊 Take after food to reduce stomach upset.",
+        "⏱️ Complete the full course even if you feel better.",
+        "🚫 Do not skip doses or stop without doctor advice.",
+        "⚠️ Stop and seek help if rash, itching or swelling appears.",
+        "🦷 May reduce effect of contraceptive pills – use extra protection."
+      ],
+      "azithromycin": [
+        "💊 Take once daily at the same time.",
+        "🍽️ Can be taken with or without food – if upset, take after food.",
+        "⏱️ Complete the full course even if symptoms improve.",
+        "⚠️ Inform doctor if you have heart rhythm problems.",
+        "🚫 Do not share antibiotics with others."
+      ],
+      "cefixime": [
+        "💊 Take with or without food as advised.",
+        "🦠 Used for bacterial infections like urine and respiratory infections.",
+        "⏱️ Complete entire course; don’t stop early.",
+        "🤢 May cause mild diarrhoea – drink fluids.",
+        "🚫 Inform doctor if severe allergy or watery diarrhoea occurs."
+      ],
+      "ciprofloxacin": [
+        "💊 Take 1–2 hours before or after dairy products (milk, curd).",
+        "🦠 Used for certain bacterial infections like UTI.",
+        "🚫 Avoid taking with iron or calcium supplements at the same time.",
+        "⚠️ Inform doctor if you have tendon pain or swelling.",
+        "☀️ Avoid too much sun exposure; may increase sensitivity."
+      ],
+      "doxycycline": [
+        "💊 Take with a full glass of water while sitting or standing.",
+        "🍽️ Best taken on empty stomach or after light meal.",
+        "☀️ Can cause sun sensitivity – use sunscreen.",
+        "🚫 Avoid taking with milk, antacids or iron at same time.",
+        "⏱️ Complete the full prescribed course."
+      ],
+      "metronidazole": [
+        "💊 Used for certain infections of gut and vagina.",
+        "🍽️ Take with food to reduce metallic taste and nausea.",
+        "🚫 Strictly avoid alcohol during treatment and 48 hours after.",
+        "🤢 May cause metallic taste or nausea in some people.",
+        "💧 Drink enough water unless restricted."
+      ],
+      "ofloxacin": [
+        "💊 Used for some urine and gut infections.",
+        "🚫 Avoid taking with antacids, iron or zinc at same time.",
+        "⚠️ Inform doctor if you have tendon pain or seizures.",
+        "☀️ Avoid direct strong sunlight if possible.",
+        "⏱️ Complete the full course as prescribed."
+      ],
+      "erythromycin": [
+        "💊 Often taken before food for better absorption.",
+        "🦠 Used in some respiratory and skin infections.",
+        "🤢 Can cause stomach upset; take with little food if needed.",
+        "⚠️ Inform doctor if you have heart rhythm problems.",
+        "⏱️ Do not stop early without medical advice."
+      ],
+      "cetirizine": [
+        "🤧 Used for allergy, sneezing and runny nose.",
+        "😴 Can cause sleepiness – avoid driving if drowsy.",
+        "🌙 Better taken at night if it makes you sleepy.",
+        "💧 Drink water to avoid dry mouth.",
+        "🍽️ Can be taken with or without food."
+      ],
+      "levocetirizine": [
+        "🤧 Used for allergy, itching and sneezing.",
+        "😴 Can cause sleepiness in some people.",
+        "🌙 Prefer taking at night if drowsy.",
+        "💧 Drink water to reduce dry mouth.",
+        "🚗 Avoid driving if you feel too sleepy."
+      ],
+      "loratadine": [
+        "🤧 Used for allergy with less chance of drowsiness.",
+        "🍽️ Can be taken with or without food.",
+        "⏱️ Usually taken once daily.",
+        "💧 Drink water to stay hydrated.",
+        "⚠️ Inform doctor if severe rash or breathing trouble occurs."
+      ],
+      "fexofenadine": [
+        "🤧 Non-drowsy antihistamine for allergy.",
+        "🍽️ Best taken with water, not fruit juice.",
+        "⏱️ Follow the prescribed once or twice daily schedule.",
+        "🚫 Avoid taking with antacids close to dose time.",
+        "💧 Maintain good fluid intake."
+      ],
+      "montelukast": [
+        "💊 Often taken in evening for asthma or allergy.",
+        "🫁 Helps prevent wheezing and breathing difficulty.",
+        "⏱️ Take daily as prescribed, not for sudden attacks.",
+        "⚠️ Inform doctor if mood changes or sleep problems occur.",
+        "🚫 Do not stop suddenly without doctor advice."
+      ],
+      "bromhexine": [
+        "🥄 Used as mucolytic to loosen thick mucus.",
+        "💧 Drink plenty of warm fluids for better effect.",
+        "🍽️ Can be taken with or without food.",
+        "🤢 May cause mild stomach discomfort.",
+        "⚠️ Use carefully in patients with gastric ulcers."
+      ],
+      "dextromethorphan": [
+        "🥄 Cough suppressant, used for dry cough.",
+        "😴 May cause mild drowsiness or dizziness.",
+        "🚫 Avoid alcohol and other sedatives.",
+        "🚗 Do not drive if you feel sleepy.",
+        "👶 Not suitable for very young children unless prescribed."
+      ],
+      "phenylephrine": [
+        "👃 Used as decongestant for blocked nose.",
+        "⏱️ Do not use for longer than recommended.",
+        "♥️ Use carefully in high blood pressure or heart disease.",
+        "😴 May cause slight restlessness or trouble sleeping.",
+        "🚫 Do not combine with other cold medicines without advice."
+      ],
+      "omeprazole": [
+        "🍽️ Take 30 minutes before food, usually in the morning.",
+        "🔥 Reduces acidity, heartburn and reflux.",
+        "🚫 Avoid very spicy, oily and heavy meals.",
+        "⏱️ Take at the same time each day for best effect.",
+        "💊 Swallow the capsule whole – do not crush or chew."
+      ],
+      "pantoprazole": [
+        "🍽️ Take 30–60 minutes before breakfast.",
+        "🔥 Reduces acidity, heartburn and ulcer symptoms.",
+        "🚫 Avoid smoking and alcohol as they worsen acidity.",
+        "⏱️ Do not use longer than advised without review.",
+        "🍵 Avoid very spicy, acidic drinks like strong tea/coffee."
+      ],
+      "ranitidine": [
+        "🍽️ Can be taken before or after meals as directed.",
+        "🔥 Reduces acidity and helps in ulcer symptoms.",
+        "⏱️ Take at the time prescribed by your doctor.",
+        "💧 Drink enough water during the day.",
+        "⚠️ Inform doctor if you notice yellowing of eyes or skin."
+      ],
+      "esomeprazole": [
+        "🍽️ Take at least 1 hour before a meal.",
+        "🔥 Used for acidity, reflux and ulcers.",
+        "⏱️ Take regularly for the duration prescribed.",
+        "🚫 Avoid heavy late-night meals.",
+        "💊 Swallow whole with water, do not crush."
+      ],
+      "domperidone": [
+        "💊 Take 15–30 minutes before food.",
+        "🤢 Used for nausea, vomiting and bloating.",
+        "⏱️ Use the shortest duration recommended.",
+        "⚠️ Inform doctor if you have heart rhythm problems.",
+        "🚫 Do not use with certain antifungal or antibiotic medicines without advice."
+      ],
+      "ondansetron": [
+        "💊 Used to prevent or treat nausea and vomiting.",
+        "🍽️ Can be taken with or without food.",
+        "⏱️ Take exactly as prescribed, usually before chemo or after surgery.",
+        "⚠️ Inform doctor if you have heart rhythm problems.",
+        "🤢 If severe constipation occurs, inform your doctor."
+      ],
+      "ors": [
+        "🥤 Mix 1 full packet in 1 litre of clean water only.",
+        "💧 Sip slowly throughout the day, not all at once.",
+        "🚫 Do not mix with milk, juice or soft drinks.",
+        "🌡️ Useful in diarrhoea, vomiting and dehydration.",
+        "🧊 Discard unused ORS after 24 hours."
+      ],
+      "loperamide": [
+        "💊 Used to reduce frequency of loose motions.",
+        "⏱️ Use only for short-term diarrhoea as advised.",
+        "🚫 Do not use if there is blood in stool or high fever.",
+        "💧 Drink plenty of fluids to prevent dehydration.",
+        "⚠️ Stop and consult doctor if symptoms persist or worsen."
+      ],
+      "metformin": [
+        "💊 Take with or just after a meal.",
+        "🩸 Used to control blood sugar in diabetes.",
+        "⏱️ Take daily at the same time as prescribed.",
+        "🤢 Mild stomach upset may occur initially and usually improves.",
+        "🚫 Do not stop suddenly without consulting your doctor."
+      ],
+      "glimepiride": [
+        "💊 Take shortly before or with breakfast.",
+        "🩸 Used to control blood sugar in type 2 diabetes.",
+        "⏱️ Take at the same time each day.",
+        "⚠️ Watch for low sugar symptoms like sweating, hunger, shakiness.",
+        "🍽️ Do not skip meals after taking this medicine."
+      ],
+      "insulin": [
+        "💉 Use exactly as prescribed, at the correct time.",
+        "🩸 Rotate injection sites to avoid skin thickening.",
+        "🍽️ Eat meals or snacks on time to avoid low sugar.",
+        "⚠️ Watch for signs of low sugar: sweating, shaking, confusion.",
+        "🧊 Store insulin in fridge, do not freeze."
+      ],
+      "amlodipine": [
+        "💊 Used to control high blood pressure and chest pain.",
+        "⏱️ Take at the same time every day.",
+        "😴 May cause dizziness or ankle swelling.",
+        "🚗 Get up slowly from sitting or lying position.",
+        "🧂 Reduce salt intake for better BP control."
+      ],
+      "losartan": [
+        "💊 Used to control high blood pressure.",
+        "💧 Drink water but avoid excessive fluid if advised by doctor.",
+        "⏱️ Take at the same time each day.",
+        "😴 May cause dizziness – rise slowly from sitting/lying.",
+        "🧂 Reduce salt intake for better blood pressure control."
+      ],
+      "telmisartan": [
+        "💊 Taken once daily for blood pressure control.",
+        "⏱️ Take at the same time every day.",
+        "💧 Stay hydrated unless fluid restriction given.",
+        "😴 May cause dizziness initially.",
+        "🧂 Low-salt diet improves effect of medicine."
+      ],
+      "metoprolol": [
+        "💊 Used for high blood pressure and some heart conditions.",
+        "🍽️ Usually taken with or after food.",
+        "😴 May cause tiredness, dizziness or slow heartbeat.",
+        "🚫 Do not stop suddenly without doctor advice.",
+        "🏃 Avoid heavy exercise until you know how it affects you."
+      ],
+      "atenolol": [
+        "💊 Used for high blood pressure and some heart problems.",
+        "⏱️ Take at the same time each day, with or without food.",
+        "😴 May cause tiredness or dizziness initially.",
+        "🚫 Do not stop suddenly; dose must be reduced gradually.",
+        "🏃 Avoid very heavy exercise without doctor advice."
+      ],
+      "domperidone": [
+        "💊 Take 15–30 minutes before food.",
+        "🤢 Used for nausea, vomiting and bloating.",
+        "⏱️ Use the shortest duration recommended.",
+        "⚠️ Inform doctor if you have heart rhythm problems.",
+        "🚫 Do not use with certain antifungal or antibiotic medicines without advice."
+      ],
+      "rabeprazole": [
+        "🍽️ Take before meals, preferably in the morning.",
+        "🔥 Reduces acidity and helps in ulcers and reflux.",
+        "⏳ May take a few days for full effect.",
+        "🚫 Avoid very spicy, citrus and fried foods.",
+        "💊 Swallow whole with water – do not crush or chew."
+      ]
+      // You can still add more medicines following this pattern.
+    };
+
+    // ---------- 2. FUZZY MATCH: ONLY *ONE* LETTER MISTAKE ALLOWED ----------
+
+    function levenshtein(a, b) {
+      const dp = Array(a.length + 1).fill(null).map(() =>
+        Array(b.length + 1).fill(0)
+      );
+      for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+      for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[a.length][b.length];
+    }
+
+    function findClosestMedicine(input) {
+      // use first word only, lowercase
+      input = (input || "").trim().toLowerCase().split(/\s+/)[0];
+      if (!input) return null;
+
+      let bestMatch = null;
+      let smallestDistance = Infinity;
+
+      for (const med in counsellingData) {
+        const dist = levenshtein(input, med);
+        if (dist < smallestDistance) {
+          smallestDistance = dist;
+          bestMatch = med;
+        }
+      }
+
+      // ✅ Only exact match (0) or ONE-letter mistake (1) allowed
+      return smallestDistance <= 1 ? bestMatch : null;
+    }
+
+    // ---------- 3. PAGE / SCREEN HANDLING ----------
+
+    const screens = {
+      1: document.getElementById("screen1"),
+      2: document.getElementById("screen2"),
+      3: document.getElementById("screen3"),
+      4: document.getElementById("screen4"),
+      5: document.getElementById("screen5")
+    };
+
+    function showScreen(n) {
+      Object.values(screens).forEach(s => s.classList.remove("active"));
+      screens[n].classList.add("active");
+    }
+
+    // ---------- 4. ELEMENTS & FLOW LOGIC ----------
+
+    const medInput = document.getElementById("medInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const errorMsg = document.getElementById("errorMsg");
+
+    const confirmName = document.getElementById("confirmName");
+    const receivedBtn = document.getElementById("receivedBtn");
+
+    const cMedName = document.getElementById("cMedName");
+    const counselList = document.getElementById("counselList");
+    const okBtn = document.getElementById("okBtn");
+
+    const anotherBtn = document.getElementById("anotherBtn");
+    const doneBtn = document.getElementById("doneBtn");
+    const backToStartBtn = document.getElementById("backToStartBtn");
+
+    let currentMedicineKey = null;
+
+    // PAGE 1: Submit medicine name
+    submitBtn.addEventListener("click", () => {
+      const rawInput = medInput.value;
+      const match = findClosestMedicine(rawInput);
+
+      if (!match) {
+        errorMsg.textContent = "❌ Invalid medicine name. Please check the spelling.";
+        return;
+      }
+
+      errorMsg.textContent = "";
+      currentMedicineKey = match;
+      confirmName.textContent = match.charAt(0).toUpperCase() + match.slice(1);
+      showScreen(2);
+    });
+
+    medInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitBtn.click();
+    });
+
+    // PAGE 2: Medicine received -> go to counselling
+    receivedBtn.addEventListener("click", () => {
+      if (!currentMedicineKey) return;
+      const med = currentMedicineKey;
+      const niceName = med.charAt(0).toUpperCase() + med.slice(1);
+
+      cMedName.textContent = niceName;
+
+      const specific = counsellingData[med] || [];
+      counselList.innerHTML = specific.map(p => `<li>${p}</li>`).join("");
+
+      showScreen(3);
+    });
+
+    // PAGE 3: OK -> Page 4
+    okBtn.addEventListener("click", () => {
+      showScreen(4);
+    });
+
+    // PAGE 4: Another medicine or Done
+    anotherBtn.addEventListener("click", () => {
+      medInput.value = "";
+      currentMedicineKey = null;
+      errorMsg.textContent = "";
+      showScreen(1);
+      medInput.focus();
+    });
+
+    doneBtn.addEventListener("click", () => {
+      showScreen(5);
+    });
+
+    // PAGE 5: Back to start
+    backToStartBtn.addEventListener("click", () => {
+      medInput.value = "";
+      currentMedicineKey = null;
+      errorMsg.textContent = "";
+      showScreen(1);
+      medInput.focus();
+    });
+
+    // Autofocus on load
+    medInput.focus();
+  </script>
+</body>
+</html>
